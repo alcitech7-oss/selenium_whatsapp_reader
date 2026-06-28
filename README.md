@@ -21,45 +21,61 @@ A bot that reads WhatsApp Web messages and automatically saves them to an Excel 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/bot_do_pao.git
-cd bot_do_pao
-```
+git clone https://github.com/alcitech7-oss/selenium_whatsapp_reader.git
+cd selenium_whatsapp_reader
 
 2. Create and activate a virtual environment:
-
-```bash
 python -m venv venv
 venv\Scripts\activate
-```
 
 3. Install dependencies:
-
-```bash
 pip install -r requirements.txt
-```
 
 ▶️ How to run
-```bash
 python main.py
-```
 
 📂 How the code works
-`main.py`: Main orchestrator
+. main.py: Main orchestrator
 
-`core/login.py`: Handles WhatsApp login
+. core/login.py: Handles WhatsApp login
 
-`core/escritor_master.py`: Reads HTML elements (spans), filters junk data, and saves to the spreadsheet
+. core/escritor_master.py: Reads HTML elements (spans), filters junk data, and saves to the spreadsheet
 
 🧪 Project status
-✅ Message and sender reading
-✅ Junk data filtering (menus, timestamps, dates)
-✅ Continuous loop (every 15 seconds)
-⚠️ Handling open Excel files (in progress)
+. ✅ Message and sender reading
+
+. ✅ Junk data filtering (menus, timestamps, dates)
+
+. ✅ Continuous loop (every 15 seconds)
+
+. ⚠️ Handling open Excel files (in progress)
+
+✅ Project Status
+Project validated and tested in a clean environment (fresh clone).
+
+. ✔️ Dependencies installed successfully
+
+. ✔️ Core features validated
+
+. ✔️ Structure and documentation reviewed
+
+. ✔️ Ready for use and demonstration
+
+📌 Development History
+Complete refactoring: "Bot do Pão" with class-based selectors and continuous loop
+
+. Organization: Modular structure with `core/` folder
+
+. Cleanup: Test files removed from the repository
+
+. Documentation: README updated and `requirements.txt` added
+
+. Final validation: Project tested and validated from scratch
 
 📌 Next steps
-Message classification (customer, delivery person, supplier)
+. Message classification (customer, delivery person, supplier)
 
-Automatic responses
+. Automatic responses
 
 Simple graphical interface
 
