@@ -1,6 +1,6 @@
 selenium_whatsapp_reader
 
-Bot that reads WhatsApp Web messages, classifies them by category (Order, Complaint, Delivery, etc.), and saves them to an Excel spreadsheet with separate tabs.
+Bot that reads WhatsApp Web messages, classifies them by category (Order, Complaint, Delivery, etc.), and saves them to an Excel spreadsheet with separate tabs, automatically detects and classifies messages in Portuguese or English..
 
 ---
 
