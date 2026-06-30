@@ -5,55 +5,136 @@ from core.selectors import CONTAINER_CONVERSA, REMETENTE, MENSAGEM, HORARIO, NAO
 from datetime import datetime
 import os
 import spacy
+from langdetect import detect, DetectorFactory
+from langdetect.lang_detect_exception import LangDetectException
 
+# Garante reprodutibilidade na detecção de idioma
+DetectorFactory.seed = 0
+
+# Carrega modelos spaCy (fallback se não encontrar)
 try:
-    nlp = spacy.load("pt_core_news_sm")
+    nlp_pt = spacy.load("pt_core_news_sm")
 except:
     print(
-        "   ⚠️ spaCy model not found. Install with: python -m spacy download pt_core_news_sm"
+        "   ⚠️ Modelo pt_core_news_sm não encontrado. Instale com: python -m spacy download pt_core_news_sm"
     )
-    nlp = None
+    nlp_pt = None
+
+try:
+    nlp_en = spacy.load("en_core_web_sm")
+except:
+    print(
+        "   ⚠️ Modelo en_core_web_sm não encontrado. Instale com: python -m spacy download en_core_web_sm"
+    )
+    nlp_en = None
 
 
-def classify_message(text):
-    if nlp is None:
-        return "Outros"
-    doc = nlp(text.lower())
-    lemmas = [token.lemma_ for token in doc]
+def detectar_idioma(texto):
+    """Detecta o idioma da mensagem (pt ou en)"""
+    try:
+        idioma = detect(texto)
+        if idioma in ["pt", "pt-br"]:
+            return "pt"
+        elif idioma == "en":
+            return "en"
+        else:
+            return "pt"  # fallback para português
+    except LangDetectException:
+        return "pt"  # fallback se não conseguir detectar
 
-    if any(
-        p in lemmas
-        for p in ["querer", "pedir", "comprar", "encomendar", "gostar", "precisar"]
-    ):
-        return "Pedidos"
-    elif any(
-        p in lemmas
-        for p in [
-            "problema",
-            "defeito",
-            "reclamar",
-            "erro",
-            "ruim",
-            "falha",
-            "queimar",
-            "atrasar",
-        ]
-    ):
-        return "Reclamações"
-    elif any(
-        p in lemmas
-        for p in ["entregar", "motoboy", "retirar", "endereço", "chegar", "sair"]
-    ):
-        return "Entregas"
-    elif any(
-        p in lemmas
-        for p in ["orçamento", "estoque", "preço", "fornecedor", "lote", "reposição"]
-    ):
-        return "Fornecedores"
-    elif any(p in lemmas for p in ["oi", "olá", "bom", "tudo", "beleza"]):
-        return "Saudações"
+
+def classificar_mensagem(texto, idioma):
+    """Classifica a mensagem com base no idioma detectado"""
+    if idioma == "pt" and nlp_pt:
+        doc = nlp_pt(texto.lower())
+    elif idioma == "en" and nlp_en:
+        doc = nlp_en(texto.lower())
     else:
+        # Fallback: usa o modelo que estiver disponível
+        doc = nlp_pt(texto.lower()) if nlp_pt else None
+
+    if doc is None:
         return "Outros"
+
+    lemas = [token.lemma_ for token in doc]
+
+    # Palavras-chave por idioma e categoria
+    if idioma == "pt":
+        palavras = {
+            "Pedidos": [
+                "querer",
+                "pedir",
+                "comprar",
+                "encomendar",
+                "gostar",
+                "precisar",
+            ],
+            "Reclamações": [
+                "problema",
+                "defeito",
+                "reclamar",
+                "erro",
+                "ruim",
+                "falha",
+                "queimar",
+                "atrasar",
+            ],
+            "Entregas": [
+                "entregar",
+                "motoboy",
+                "retirar",
+                "endereço",
+                "chegar",
+                "sair",
+            ],
+            "Fornecedores": [
+                "orçamento",
+                "estoque",
+                "preço",
+                "fornecedor",
+                "lote",
+                "reposição",
+            ],
+            "Saudações": ["oi", "olá", "bom", "tudo", "beleza"],
+        }
+    else:  # inglês
+        palavras = {
+            "Pedidos": ["want", "order", "buy", "get", "need", "would like"],
+            "Reclamações": [
+                "problem",
+                "defect",
+                "complain",
+                "error",
+                "bad",
+                "fail",
+                "broken",
+                "late",
+            ],
+            "Entregas": [
+                "deliver",
+                "delivery",
+                "motoboy",
+                "pickup",
+                "address",
+                "arrive",
+                "leave",
+            ],
+            "Fornecedores": [
+                "budget",
+                "stock",
+                "price",
+                "supplier",
+                "batch",
+                "replenish",
+            ],
+            "Saudações": ["hi", "hello", "good", "how are you", "hey"],
+        }
+
+    for categoria, palavras_chave in palavras.items():
+        if any(p in lemas for p in palavras_chave):
+            return categoria
+
+    return "Outros"
 
 
 def extract_containers(driver, filename):
@@ -125,7 +206,10 @@ def extract_containers(driver, filename):
             if not message:
                 continue
 
-            target_sheet = classify_message(message)
+            # Detecta idioma e classifica
+            idioma = detectar_idioma(message)
+            target_sheet = classificar_mensagem(message, idioma)
+
             key = (target_sheet, sender)
             if key in last_messages and last_messages[key] == message:
                 print(f"   ⏭️  Container {i}: duplicate message (ignored)")
@@ -141,7 +225,7 @@ def extract_containers(driver, filename):
             total_added += 1
             last_messages[key] = message
             print(
-                f"   ✅ Container {i}: {sender} - {message[:30]}... (NEW in {target_sheet})"
+                f"   ✅ Container {i}: {sender} - {message[:30]}... (NEW in {target_sheet} | {idioma})"
             )
 
     except Exception as e:

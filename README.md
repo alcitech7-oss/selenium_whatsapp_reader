@@ -1,45 +1,87 @@
-# 🍞 Bot do Pão
+selenium_whatsapp_reader
 
-Bot que lê mensagens do WhatsApp Web, classifica por categoria (Pedido, Reclamação, Entrega, etc.) e salva em planilha Excel.
+Bot that reads WhatsApp Web messages, classifies them by category (Order, Complaint, Delivery, etc.), and saves them to an Excel spreadsheet with separate tabs.
 
-## 🚀 Funcionalidades
-- Login automático via QR Code
-- Leitura de mensagens em tempo real
-- Classificação com inteligência (spaCy)
-- Planilha com abas separadas por categoria
-- Filtro de mensagens repetidas
+---
 
-## 🛠️ Tecnologias
+## 🚀 Features
+
+- ✅ Automatic login via QR Code
+- ✅ Real-time message reading (continuous loop)
+- ✅ Intelligent classification with spaCy (lemmas and context)
+- ✅ Excel spreadsheet with separate tabs per category
+- ✅ Duplicate message filter (only adds new ones)
+- ✅ Automatic pop-up closing
+- ✅ **Bilingual support: automatically detects and classifies messages in Portuguese or English**
+
+---
+
+## 🛠️ Technologies
+
 - Python 3.10+
 - Selenium
 - OpenPyXL
-- spaCy
+- spaCy (NLP for classification)
+- WebDriver Manager
+- langdetect (language detection)
 
-## 📦 Como instalar
+---
+
+## 📦 Installation
+
 ```bash
-git clone https://github.com/seu-usuario/bot_do_pao.git
-cd bot_do_pao
+git clone https://github.com/alcitech7-oss/selenium_whatsapp_reader.git
+cd selenium_whatsapp_reader
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 python -m spacy download pt_core_news_sm
-▶️ Como rodar
+python -m spacy download en_core_web_sm
+▶️ How to run
 bash
 python main.py
-📂 Estrutura
-. main.py: orquestrador
+📂 Project Structure
+text
+selenium_whatsapp_reader/
+├── main.py
+├── requirements.txt
+├── README.md
+├── .gitignore
+├── core/
+│   ├── __init__.py
+│   ├── login.py          # Handles WhatsApp login
+│   ├── extractor.py      # Extracts and classifies messages
+│   └── selectors.py      # XPath selectors
+✅ Project Validated
+Tested in a clean environment (fresh clone):
 
-. core/login.py: login no WhatsApp
+✔️ Dependencies installed successfully
 
-. core/extrator.py: extrai e classifica mensagens
+✔️ Login via QR Code working
 
-. core/seletores.py: seletores XPath
+✔️ Message reading and classification ok
 
-📌 Status
-✅ Leitura de mensagens
-✅ Classificação por categoria
-✅ Loop contínuo
-⚠️ Ajuste fino da classificação (em andamento)
+✔️ Spreadsheet generated with separate tabs
 
-🤝 Contribuição
-Sinta-se à vontade para contribuir!
+✔️ Continuous loop and pop-up handling ok
+
+✔️ Bilingual support validated (PT / EN)
+
+✔️ Ready for use and demonstration
+
+📌 Development History
+Complete refactoring: class-based selectors and continuous loop
+
+Organization: Modular structure with core/ folder
+
+Classification: Implemented with spaCy (lemmas and NLP)
+
+Bilingual support: Added Portuguese and English detection with langdetect
+
+Spreadsheet: Separate tabs per category
+
+Final validation: Project tested and validated from scratch
+
+🤝 Contribution
+Feel free to contribute with improvements, new categories, or bug fixes.
+
